@@ -20,10 +20,10 @@ LABEL org.opencontainers.image.title="EvoSC Trackmania/ManiaPlanet Server Contro
 # create base dir
 RUN set -eux; \
     addgroup -g 9999 evosc && \
-    adduser -u 9999 -Hh /controller -G evosc -s /sbin/nologin -D evosc && \
-    install -d -o evosc -g evosc -m 775 /controller
+    adduser -u 9999 -Hh /home/container -G evosc -s /sbin/nologin -D evosc && \
+    install -d -o evosc -g evosc -m 775 /home/container
 
-WORKDIR /controller
+WORKDIR /home/container
 
 # install packages
 RUN apk add --no-cache unzip git libpng-dev zlib-dev curl-dev libzip-dev zip jq su-exec procps libjpeg-turbo-dev bash
@@ -39,9 +39,9 @@ RUN docker-php-ext-configure gd --with-jpeg && docker-php-ext-install gd && \
 RUN echo 'memory_limit = 512M' >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini
 
 # install evosc
-RUN git clone --branch ${EVOSC_BRANCH} ${EVOSC_GIT} /controller && \
+RUN git clone --branch ${EVOSC_BRANCH} ${EVOSC_GIT} /home/container && \
     composer i --no-dev && \
-    chown evosc:evosc -Rf /controller
+    chown evosc:evosc -Rf /home/container
 
 # copy entrypoint.sh
 COPY entrypoint.sh /usr/local/bin/
