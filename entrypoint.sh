@@ -4,14 +4,14 @@ set -e
 
 # we don't want to start EvoSC with root permissions
 if [ "$2" = 'esc' -a "$(id -u)" = '0' ]; then
-	chown -R evosc /controller/esc
+	chown -R evosc /home/container/esc
 	exec su-exec evosc "$0" "$@"
 fi
 
 if [ "$2" = 'esc' ]; then
-	[ ! -f /controller/config/theme.config.json ] && cp /controller/config/default/theme.config.json /controller/config/theme.config.json
-	[ ! -f /controller/config/database.config.json ] && cp /controller/config/default/database.config.json /controller/config/database.config.json
-	[ ! -f /controller/config/server.config.json ] && cp /controller/config/default/server.config.json /controller/config/server.config.json
+	[ ! -f /home/container/config/theme.config.json ] && cp /home/container/config/default/theme.config.json /home/container/config/theme.config.json
+	[ ! -f /home/container/config/database.config.json ] && cp /home/container/config/default/database.config.json /home/container/config/database.config.json
+	[ ! -f /home/container/config/server.config.json ] && cp /home/container/config/default/server.config.json /home/container/config/server.config.json
 
 	databaseConfig=()
 	databaseConfig+=('.host = '\"${DB_HOST}\"'')
@@ -19,8 +19,8 @@ if [ "$2" = 'esc' ]; then
 	databaseConfig+=('| .user = '\"${DB_USER}\"'')
 	databaseConfig+=('| .password = '\"${DB_PASSWORD}\"'')
 
-	eval jq \'${databaseConfig[@]}\' /controller/config/database.config.json > /controller/config/database.config.json.tmp
-	mv /controller/config/database.config.json.tmp /controller/config/database.config.json
+	eval jq \'${databaseConfig[@]}\' /home/container/config/database.config.json > /home/container/config/database.config.json.tmp
+	mv /home/container/config/database.config.json.tmp /home/container/config/database.config.json
 
 	serverConfig=()
 	serverConfig+=('.ip = '\"${RPC_IP}\"'')
@@ -29,10 +29,10 @@ if [ "$2" = 'esc' ]; then
 	serverConfig+=('| .rpc.password = '\"${RPC_PASSWORD:-SuperAdmin}\"'')
 	serverConfig+=('| .["default-matchsettings"] = '\"${GAME_SETTINGS:-default.txt}\"'')
 
-	eval jq \'${serverConfig[@]}\' /controller/config/server.config.json > /controller/config/server.config.json.tmp
-	mv /controller/config/server.config.json.tmp /controller/config/server.config.json
+	eval jq \'${serverConfig[@]}\' /home/container/config/server.config.json > /home/container/config/server.config.json.tmp
+	mv /home/container/config/server.config.json.tmp /home/container/config/server.config.json
 
-	[ ! -f /controller/cache/.setupfinished ] && touch /controller/cache/.setupfinished
+	[ ! -f /home/container/cache/.setupfinished ] && touch /home/container/cache/.setupfinished
 fi
 
 exec "$@"
